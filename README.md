@@ -1,10 +1,19 @@
 # DIEM Assistant — Hybrid Agentic RAG for a University Department
 
+![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+![LangGraph](https://img.shields.io/badge/agent-LangGraph-1c3c3c)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 A conversational assistant that answers students' questions about the **DIEM** department (Department of Information and Electrical Engineering and Applied Mathematics, University of Salerno) using **only** official university sources, always citing them as inline links.
 
 It is an end-to-end **Retrieval-Augmented Generation** system: a custom web crawler builds the knowledge base, a parent-child indexer turns it into a vector + lexical index, and a **LangGraph** agent combines guardrails, query rewriting, hybrid retrieval, cross-encoder re-ranking and a score-aware context budget before generating the answer. It ships with a **Chainlit** web UI and a **RAGAS** evaluation pipeline.
 
 > Project work for the *Natural Language Processing and Large Language Models* course, MSc in Computer Engineering (AI), University of Salerno. The assistant answers in Italian, the language of its sources.
+
+<p align="center">
+  <img src="assets/GUI.png" width="49%" alt="Chatot interface">
+</p>
+<p align="center"><sub>Chatbot interface.</sub></p>
 
 ---
 
@@ -99,6 +108,13 @@ The high context recall shows that retrieval almost always finds the information
 | `config.py` | Paths, hyper-parameters, feature flags and model factories |
 | `public/`, `.chainlit/` | UI theme, logos, custom CSS/JS and Chainlit configuration |
 
+
+<p align="center">
+  <img src="assets/question_erasmus.png" width="49%" alt="Answer describing the ERASMUS program (light theme)">
+  <img src="assets/question_info.png" width="49%" alt="Answer computing the final degree grade from the degree regulation (dark theme)">
+</p>
+<p align="center"><sub>Left: the agent answers describing the ERASMUS program (light theme). Right: the agent retrieves the grade formula from the degree regulation, computes the result with the <code>compute</code> tool and cites its sources.</sub></p>
+
 ## Getting started
 
 ### 1. Install
@@ -180,4 +196,7 @@ Main retrieval hyper-parameters: `K_CHILDREN=125`, `K_CHILDREN_BM25=60`, `TOP_K=
 ## Team
 
 Developed by Group 03 for the NLP & LLM course at the University of Salerno:
-Salvatore Francesco Tartaglione, Raffaele Calabrese, Christian Rosa, Candido Simone Savino.
+Salvatore Francesco Tartaglione ([@SalvatoreFTartaglione](https://github.com/SalvatoreFTartaglione)) — repository maintainer
+Raffaele Calabrese
+Christian Rosa
+Candido Simone Savino.
