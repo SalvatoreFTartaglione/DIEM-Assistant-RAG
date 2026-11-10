@@ -1,0 +1,37 @@
+# Tested with Python 3.11
+
+# LLM orchestration
+langchain-core
+langchain-community
+langchain-text-splitters
+langchain-openai
+langchain-ollama
+langchain-huggingface
+langchain-chroma
+langgraph
+
+# Retrieval
+chromadb
+sentence-transformers   # cross-encoder reranker (BAAI/bge-reranker-v2-m3)
+torch
+rank-bm25
+spacy                   # + python -m spacy download it_core_news_lg
+numpy
+
+# Crawling & preprocessing
+requests
+urllib3
+beautifulsoup4
+trafilatura
+pymupdf4llm
+ftfy
+
+# UI
+chainlit>=2.0
+
+# Evaluation
+ragas
+pandas
+
+# Misc
+python-dotenv

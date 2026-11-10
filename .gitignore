@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets
+.env
+
+# Generated data (rebuilt by the pipeline: extractor -> kb_filter -> indexer -> bm25_indexer)
+diem_knowledge_base.json
+raw_documents_full.json
+diem_chroma_db/
+diem_chroma_db_backup/
+last_ded_chroma/
+debug_parent_child_chunks.json
+
+# Logs and test outputs
+crawler_log.txt
+test_results/
+
+# Chainlit runtime files
+.files/
+.chainlit/translations/
+
+# Local diagnostic scripts
+diagnose_chroma.py
+diagnose_kb.py
+kb_comparison.py
+
+.git_old_backup/
