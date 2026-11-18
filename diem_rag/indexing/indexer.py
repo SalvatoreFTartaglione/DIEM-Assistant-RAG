@@ -34,7 +34,7 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-import config
+from diem_rag import config
 
 
 
@@ -303,7 +303,7 @@ def _make_metadata_context(metadata: dict, title: str = "") -> str:
         year, section) alongside the raw text, improving recall for queries
         that name these entities explicitly.
     2. Title-filter anchor: the "title" field is the same string used by
-        chatbot.py's $contains filter, so its presence in the chunk text
+        the agent's $contains filter, so its presence in the chunk text
         guarantees the filter can match even when the body text alone would
         not contain the exact title wording.
 
@@ -401,7 +401,7 @@ def load_documents(json_path: str) -> List[Document]:
         extra_meta = entry.get("metadata", {})
         bando_label = extra_meta.get("bando_label")
         # normalise "anno" to str so ChromaDB always stores
-        # it as a string, making $eq filters in chatbot.py reliable.
+        # it as a string, making $eq filters in the agent reliable.
         # Without this, anno arrives as int from crawl_courses (int(qs_anno))
         # and as str from other paths, causing silent $eq mismatches.
         anno_raw    = extra_meta.get("anno")
@@ -982,7 +982,7 @@ def build_db_from_json(json_path: str = JSON_PATH) -> tuple[Chroma, ParentStore]
     print(f"  Indexed child chunks : {len(children)}")
     print(f"  Saved parent chunks  : {len(parents)}")
     print(f"  Sanity check         : {'PASSED' if sanity_ok else 'FAILED — restore from backup'}")
-    print("  Next step            : python bm25_indexer.py  (rebuild the lexical indices)")
+    print("  Next step            : python -m diem_rag.indexing.bm25_indexer  (rebuild the lexical indices)")
     print("=" * 60)
 
     return child_db, parent_store

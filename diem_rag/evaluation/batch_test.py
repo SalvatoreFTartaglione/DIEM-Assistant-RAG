@@ -5,10 +5,10 @@ Automated batch testing for the DIEM Agentic RAG chatbot.
 Runs a list of questions as a single conversation session, captures all
 stdout output (including debug traces) for each turn, and saves the full
 results to a Markdown file. The resulting log (with DEBUG=True) is the input
-format expected by RAGAS.py.
+format expected by ragas_eval.py.
 
 Usage:
-    python batch_test.py --set 2
+    python -m diem_rag.evaluation.batch_test --set 2
 """
 
 import argparse
@@ -18,7 +18,7 @@ from contextlib import redirect_stdout
 from datetime import datetime
 from pathlib import Path
 
-from chatbot import run_turn
+from diem_rag.agent.conversation import run_turn
 
 # ---------------------------------------------------------------------------
 # CONFIGURATION

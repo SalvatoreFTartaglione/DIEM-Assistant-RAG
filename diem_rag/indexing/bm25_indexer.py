@@ -34,7 +34,7 @@ import re
 import time
 from pathlib import Path
 from typing import Any
-import config
+from diem_rag import config
 import spacy
 from rank_bm25 import BM25Okapi
 

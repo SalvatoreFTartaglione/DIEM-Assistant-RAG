@@ -93,7 +93,7 @@ DEBUG_SAMPLE_SIZE = 50         # number of parents (with their children) to expo
 
 
 # ============================================================
-# RETRIEVAL & GENERATION (chatbot.py)
+# RETRIEVAL & GENERATION (diem_rag/agent)
 # ============================================================
 K_CHILDREN        = 125   # child chunks retrieved per semantic pass (before parent expansion)
 K_CHILDREN_BM25   = 60    # child chunks retrieved per BM25 index

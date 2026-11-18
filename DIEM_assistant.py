@@ -4,14 +4,15 @@ Chainlit web interface for the DIEM Agentic RAG chatbot.
 Run with:  chainlit run DIEM_assistant.py
       or:  python DIEM_assistant.py   (starts the same Chainlit server)
 
-This module exposes the LangGraph agent defined in chatbot.py through a
-Chainlit chat interface. Each user message is processed by chatbot.run_turn
-(the same function used by the terminal chat and by batch_test.py), and a
-per-session chat history is kept in the Chainlit user session.
+This module exposes the LangGraph agent defined in diem_rag/agent through a
+Chainlit chat interface. Each user message is processed by
+diem_rag.agent.conversation.run_turn (the same function used by the terminal
+chat and by batch_test.py), and a per-session chat history is kept in the
+Chainlit user session.
 
-The heavy initialization performed at import time in chatbot.py (embedding
-model, vector store connection, BM25 indices, LLM clients, etc.) runs once
-when this module is loaded, and is shared across all chat sessions.
+The heavy initialization performed at import time in diem_rag.agent.resources
+(embedding model, vector store connection, BM25 indices, LLM clients, etc.)
+runs once when this module is loaded, and is shared across all chat sessions.
 """
 
 import os
@@ -32,8 +33,8 @@ import time
 
 import chainlit as cl
 
-import config
-from chatbot import run_turn
+from diem_rag import config
+from diem_rag.agent.conversation import run_turn
 
 CHAT_HISTORY_KEY = "chat_history"
 

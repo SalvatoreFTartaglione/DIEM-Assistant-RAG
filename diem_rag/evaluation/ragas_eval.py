@@ -26,7 +26,7 @@ Expected input files:
 Turns are matched by their "## Turn N" number between the two log files.
 
 Usage:
-    python RAGAS.py --test-log test_results/62_test.md --ground-truth test_results/62_adjusted.md
+    python -m diem_rag.evaluation.ragas_eval --test-log test_results/62_test.md --ground-truth test_results/62_adjusted.md
 """
 
 import argparse
@@ -46,8 +46,8 @@ from ragas.metrics import (
     ResponseRelevancy,
 )
 
-import config
-from config import PARENT_STORE_PATH
+from diem_rag import config
+from diem_rag.config import PARENT_STORE_PATH
 
 # ---------------------------------------------------------------------------
 # Configuration

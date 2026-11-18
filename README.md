@@ -24,7 +24,7 @@ It is an end-to-end **Retrieval-Augmented Generation** system: a custom web craw
 - **Parent-child chunking**: small, metadata-enriched *child* chunks are embedded for precise search; larger *parent* chunks are returned to the LLM for context. Deterministic SHA-256 ids, incremental re-indexing and a post-indexing sanity check.
 - **Hybrid retrieval**: multi-pass semantic search with LLM-extracted metadata filters and automatic fallbacks, plus **dual BM25** (lemmatized with spaCy and raw, to keep acronyms like `CUN` or `ISPD`), merged with **Reciprocal Rank Fusion**.
 - **Re-ranking and context budgeting**: `BAAI/bge-reranker-v2-m3` cross-encoder, then a softmax-weighted allocation of the character budget that gives more room to the most relevant documents.
-- **Agentic control flow (LangGraph)**: input guardrail (domain classifier), history-aware query rewriting (coreference resolution), optional hallucination checker with bounded regeneration. Every node can be switched on or off from `config.py`.
+- **Agentic control flow (LangGraph)**: input guardrail (domain classifier), history-aware query rewriting (coreference resolution), optional hallucination checker with bounded regeneration. Every node can be switched on or off from `diem_rag/config.py`.
 - **Grounded answers**: strict system prompt (context-only answers, verbatim proper nouns, inline source links, no invented numbers) and an anti-babbling guard.
 - **Evaluation**: 62-question benchmark scored with RAGAS (faithfulness, answer relevancy, context precision/recall, answer correctness).
 
@@ -95,18 +95,31 @@ The high context recall shows that retrieval almost always finds the information
 
 ## Repository structure
 
-| File | Role |
-|---|---|
-| `extractor.py` | Crawler: builds `diem_knowledge_base.json` from the university websites and PDFs |
-| `kb_filter.py` | Knowledge-base deduplication (HTML: URL + content hash; PDF: year versioning, content hash, cross-domain) |
-| `indexer.py` | Parent-child chunking, embedding into ChromaDB, parent store, incremental indexing, sanity check |
-| `bm25_indexer.py` | Builds the lemmatized and raw BM25 indices from the child chunks |
-| `chatbot.py` | LangGraph agent (guardrail, rewriting, hybrid retrieval, re-ranking, generation) plus a terminal chat |
-| `DIEM_assistant.py` | Chainlit web interface |
-| `batch_test.py` | Runs question sets as one conversation and logs answers and retrieval traces |
-| `RAGAS.py` | RAGAS evaluation from saved test logs and manually corrected references |
-| `config.py` | Paths, hyper-parameters, feature flags and model factories |
-| `public/`, `.chainlit/` | UI theme, logos, custom CSS/JS and Chainlit configuration |
+```
+DIEM_assistant.py          Chainlit web interface (entry point)
+diem_rag/
+├── config.py              paths, hyper-parameters, feature flags, model factories
+├── ingestion/
+│   ├── extractor.py       crawler: university websites + linked PDFs -> diem_knowledge_base.json
+│   └── kb_filter.py       knowledge-base deduplication
+├── indexing/
+│   ├── indexer.py         parent-child chunking, ChromaDB embedding, incremental indexing
+│   └── bm25_indexer.py    lemmatized and raw BM25 indices
+├── agent/
+│   ├── resources.py       models, vector store, parent store and BM25 indices (loaded once)
+│   ├── state.py           LangGraph state and chat-history window
+│   ├── prompts.py         prompt templates
+│   ├── retrieval.py       multi-pass semantic + BM25 retrieval, RRF, cross-encoder re-ranking
+│   ├── context.py         score-aware context budget
+│   ├── nodes.py           guardrails, query rewriting, generation, regeneration
+│   ├── graph.py           graph wiring (nodes toggled by config flags)
+│   ├── conversation.py    run_turn(): one user turn, shared by UI, CLI and tests
+│   └── cli.py             terminal chat
+└── evaluation/
+    ├── batch_test.py      runs question sets and logs answers + retrieval traces
+    └── ragas_eval.py      RAGAS evaluation against manually corrected references
+public/, .chainlit/        UI theme, logos, custom CSS/JS and Chainlit configuration
+```
 
 
 <p align="center">
@@ -138,34 +151,36 @@ ollama pull embeddinggemma
 cp .env.example .env             # then set OPENROUTER_API_KEY
 ```
 
-To run fully locally, set `USE_OPENROUTER = False` in `config.py` (it uses `llama3.1` through Ollama).
+To run fully locally, set `USE_OPENROUTER = False` in `diem_rag/config.py` (it uses `llama3.1` through Ollama).
 
 ### 3. Build the knowledge base and the indices
 
 ```bash
-python extractor.py      # crawl (takes a while; writes diem_knowledge_base.json)
-python kb_filter.py      # deduplicate
-python indexer.py        # chunk + embed into ChromaDB
-python bm25_indexer.py   # build the BM25 indices
+python -m diem_rag.ingestion.extractor     # crawl (takes a while; writes diem_knowledge_base.json)
+python -m diem_rag.ingestion.kb_filter     # deduplicate
+python -m diem_rag.indexing.indexer        # chunk + embed into ChromaDB
+python -m diem_rag.indexing.bm25_indexer   # build the BM25 indices
 ```
+
+All commands are run from the repository root.
 
 ### 4. Chat
 
 ```bash
-chainlit run DIEM_assistant.py   # web UI on http://localhost:8000 (or: python DIEM_assistant.py)
-python chatbot.py                # or a terminal chat with full debug traces
+chainlit run DIEM_assistant.py             # web UI on http://localhost:8000 (or: python DIEM_assistant.py)
+python -m diem_rag.agent.cli               # or a terminal chat with full debug traces
 ```
 
 ### 5. Evaluate
 
 ```bash
-python batch_test.py --set 2     # 62-question benchmark -> test_results/batch_test_<timestamp>.md
-python RAGAS.py --test-log <generated log> --ground-truth <manually corrected copy>
+python -m diem_rag.evaluation.batch_test --set 2   # 62-question benchmark -> test_results/batch_test_<timestamp>.md
+python -m diem_rag.evaluation.ragas_eval --test-log <generated log> --ground-truth <manually corrected copy>
 ```
 
 ## Configuration
 
-Every stage can be tuned or toggled from `config.py`, which made it possible to run ablations during development:
+Every stage can be tuned or toggled from `diem_rag/config.py`, which made it possible to run ablations during development:
 
 | Flag | Default | Effect |
 |---|---|---|
